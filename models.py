@@ -11,12 +11,12 @@ class Item(BaseModel):
     current_bid: Optional[float] = None
     end_time: datetime
 
-class Buyer(BaseModel):
+class Comprador(BaseModel):
     id: int
     name: str
 
-class Bid(BaseModel):
+class Oferta(BaseModel):
     item_id: int
-    buyer_id: int
-    bid_amount: float
-    bid_time: datetime
+    comprador_id: int
+    oferta_valor: float
+    oferta_hora: datetime

@@ -1,44 +1,57 @@
 # main.py
 from fastapi import FastAPI, HTTPException
-from models import Item, Buyer, Bid
+from models import Item, Comprador, Oferta
 from datetime import datetime
 from typing import List
 
 app = FastAPI()
 
-items = []
-buyers = []
-bids = []
+itens = []
+compradores = []
+ofertas = []
 
-@app.post("/items/", response_model=Item)
-def create_item(item: Item):
-    items.append(item)
+@app.post("/itens/", response_model=Item)
+def inserir_item(item: Item):
+    itens.append(item)
     return item
 
-@app.post("/buyers/", response_model=Buyer)
-def create_buyer(buyer: Buyer):
-    buyers.append(buyer)
-    return buyer
+@app.post("/compradores/", response_model=Comprador)
+def adicionar_comprador(comprador: Comprador):
+    compradores.append(comprador)
+    return comprador
 
-@app.post("/bids/")
-def place_bid(bid: Bid):
-    item = next((item for item in items if item.id == bid.item_id), None)
+@app.get("/compradores/", response_model=List[Comprador])
+def listar_compradores():
+    if not compradores:
+        raise HTTPException(status_code=404, detail="Nenhum comprador encontrado")
+    return compradores
+
+@app.post("/ofertas/")
+def fazer_oferta(oferta: Oferta):
+    item = next((item for item in itens if item.id == oferta.item_id), None)
     if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    if bid.bid_amount <= (item.current_bid or item.initial_bid):
-        raise HTTPException(status_code=400, detail="Bid must be higher than the current bid")
-    item.current_bid = bid.bid_amount
-    bids.append(bid)
-    return bid
+        raise HTTPException(status_code=404, detail="Item não encontrado")
+    if oferta.oferta_valor <= (item.current_bid or item.initial_bid):
+        raise HTTPException(status_code=400, detail="A oferta deve ser maior que a oferta atual")
+    item.current_bid = oferta.oferta_valor
+    ofertas.append(oferta)
+    return oferta
 
-@app.get("/items/", response_model=List[Item])
-def list_items():
-    return items
+@app.get("/ofertas/{item_id}", response_model=List[Oferta])
+def listar_ofertas(item_id: int):
+    item_ofertas = [oferta for oferta in ofertas if oferta.item_id == item_id]
+    if not item_ofertas:
+        raise HTTPException(status_code=404, detail="Nenhuma oferta encontrada para este item")
+    return item_ofertas
 
-@app.get("/items/{item_id}", response_model=Item)
-def get_item(item_id: int):
-    item = next((item for item in items if item.id == item_id), None)
+@app.get("/itens/", response_model=List[Item])
+def listar_itens():
+    return itens
+
+@app.get("/itens/{item_id}", response_model=Item)
+def listar_item(item_id: int):
+    item = next((item for item in itens if item.id == item_id), None)
     if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(status_code=404, detail="Item não encontrado")
     return item
     
