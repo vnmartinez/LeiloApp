@@ -4,6 +4,7 @@ from models import Item, Comprador, Oferta
 from datetime import datetime
 from typing import List
 import uvicorn
+import os
 
 app = FastAPI()
 
