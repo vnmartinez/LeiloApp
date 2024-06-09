@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from models import Item, Comprador, Oferta
 from datetime import datetime
 from typing import List
+import uvicorn
 
 app = FastAPI()
 
@@ -55,3 +56,5 @@ def listar_item(item_id: int):
         raise HTTPException(status_code=404, detail="Item não encontrado")
     return item
     
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=os.getenv("PORT", default=5000), log_level="info")
